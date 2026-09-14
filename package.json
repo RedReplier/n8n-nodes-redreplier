@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-redreplier",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "n8n community node for RedReplier: react to new Reddit, X, Bluesky and Hacker News mentions and manage monitored websites",
   "license": "MIT",
   "homepage": "https://redreplier.com",

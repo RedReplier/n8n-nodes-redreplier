@@ -11,7 +11,11 @@ import { getWebsites, MENTION_SOURCE_OPTIONS, type Mention } from './shared';
 import { redReplierApiRequest } from './transport';
 
 const MANUAL_SAMPLE_SIZE = 3;
-const REMEMBERED_IDS = 1000;
+const PAGE_SIZE = 100;
+const MAX_PAGES = 5;
+const REMEMBERED_IDS = 2000;
+// Mentions are scored after ingestion, so one can pass the filters well after its ingestedAt.
+const INGESTION_OVERLAP_MS = 60 * 60 * 1000;
 
 export class RedReplierTrigger implements INodeType {
 	description: INodeTypeDescription = {
@@ -90,23 +94,40 @@ export class RedReplierTrigger implements INodeType {
 			minScore: minScore > 0 ? minScore : undefined,
 			statuses: ['NEW'],
 			sort: 'RECENT',
-			limit: 100,
 		};
 
-		const { mentions } = await redReplierApiRequest.call(this, 'GET', '/mentions', undefined, qs);
-		const relevant = mentions as Mention[];
-
 		if (this.getMode() === 'manual') {
-			const sample = relevant.slice(0, MANUAL_SAMPLE_SIZE);
+			const { mentions } = await redReplierApiRequest.call(this, 'GET', '/mentions', undefined, {
+				...qs,
+				limit: MANUAL_SAMPLE_SIZE,
+			});
+			const sample = mentions as Mention[];
 			return sample.length ? [this.helpers.returnJsonArray(sample as IDataObject[])] : null;
 		}
 
+		const pollStartedAt = Date.now();
+		const lastPollAt = (staticData.lastPollAt as number | undefined) ?? pollStartedAt;
+		qs.from = new Date(lastPollAt - INGESTION_OVERLAP_MS).toISOString();
+
+		const found: Mention[] = [];
+		for (let page = 0; page < MAX_PAGES; page++) {
+			const { mentions } = await redReplierApiRequest.call(this, 'GET', '/mentions', undefined, {
+				...qs,
+				limit: PAGE_SIZE,
+				offset: page * PAGE_SIZE,
+			});
+			const batch = mentions as Mention[];
+			found.push(...batch);
+			if (batch.length < PAGE_SIZE) break;
+		}
+
 		const firstRun = staticData.seenIds === undefined;
-		const fresh = relevant.filter((mention) => !seenIds.includes(mention.id));
+		const fresh = found.filter((mention) => !seenIds.includes(mention.id));
 		staticData.seenIds = [...fresh.map((mention) => mention.id), ...seenIds].slice(
 			0,
 			REMEMBERED_IDS,
 		);
+		staticData.lastPollAt = pollStartedAt;
 
 		if (firstRun || fresh.length === 0) {
 			return null;

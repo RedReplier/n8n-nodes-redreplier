@@ -60,7 +60,8 @@ export const websiteProperties: INodeProperties[] = [
 			{
 				name: 'Update',
 				value: 'update',
-				action: 'Rename a website',
+				action: 'Update a website',
+				description: 'Rename a website or rewrite its description',
 				routing: {
 					request: { method: 'PATCH', url: '=/websites/{{$parameter.websiteId}}' },
 				},
@@ -86,7 +87,45 @@ export const websiteProperties: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		displayOptions: { show: { resource: ['website'], operation: ['create', 'update'] } },
-		routing: { send: { type: 'body', property: 'name' } },
+		description: 'Leave empty to keep the current name, or the domain on create',
+		routing: { send: { type: 'body', property: 'name', value: '={{ $value || undefined }}' } },
+	},
+	{
+		displayName: 'Description',
+		name: 'description',
+		type: 'string',
+		typeOptions: { rows: 4 },
+		default: '',
+		displayOptions: { show: { resource: ['website'], operation: ['create'] } },
+		description:
+			'What the product does. RedReplier scores mentions against it. Leave empty to have RedReplier scrape the URL and write one, unless Analyze Website is off.',
+		routing: {
+			send: {
+				type: 'body',
+				property: 'description',
+				value: '={{ $value || ($parameter.analyze === false ? "" : undefined) }}',
+			},
+		},
+	},
+	{
+		displayName: 'Analyze Website',
+		name: 'analyze',
+		type: 'boolean',
+		default: true,
+		displayOptions: { show: { resource: ['website'], operation: ['create'] } },
+		description:
+			'Whether RedReplier scrapes the URL and drafts a description when Description is empty. Turn off to skip the paid analysis; the website then has no description until you set one with Update.',
+	},
+	{
+		displayName: 'Description',
+		name: 'description',
+		type: 'string',
+		typeOptions: { rows: 4 },
+		default: '',
+		displayOptions: { show: { resource: ['website'], operation: ['update'] } },
+		description:
+			'New product description. RedReplier scores mentions against it. Leave empty to keep the current one.',
+		routing: { send: { type: 'body', property: 'description', value: '={{ $value || undefined }}' } },
 	},
 	{
 		displayName: 'Keywords',

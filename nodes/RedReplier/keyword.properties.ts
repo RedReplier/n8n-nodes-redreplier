@@ -24,6 +24,8 @@ export const keywordProperties: INodeProperties[] = [
 				name: 'Delete',
 				value: 'delete',
 				action: 'Delete a keyword',
+				description:
+					'Delete a keyword and every mention it found. This cannot be undone. Use Disable to stop monitoring and keep the mentions.',
 				routing: {
 					request: { method: 'DELETE', url: '=/keywords/{{$parameter.keywordId}}' },
 				},
@@ -72,6 +74,14 @@ export const keywordProperties: INodeProperties[] = [
 				value: '={{ $value.split(",").map((k) => k.trim()).filter(Boolean) }}',
 			},
 		},
+	},
+	{
+		displayName:
+			'Deleting a keyword also deletes every mention it found, with no undo. Use Disable to stop monitoring and keep the mentions.',
+		name: 'deleteNotice',
+		type: 'notice',
+		default: '',
+		displayOptions: { show: { resource: ['keyword'], operation: ['delete'] } },
 	},
 	{
 		displayName: 'Keyword ID',

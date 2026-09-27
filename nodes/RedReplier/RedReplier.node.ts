@@ -26,6 +26,7 @@ export class RedReplier implements INodeType {
 		credentials: [{ name: 'redReplierApi', required: true }],
 		requestDefaults: {
 			baseURL: API_BASE_URL,
+			arrayFormat: 'repeat',
 			headers: {
 				Accept: 'application/json',
 				'Content-Type': 'application/json',

@@ -93,7 +93,8 @@ export const mentionProperties: INodeProperties[] = [
 				name: 'from',
 				type: 'dateTime',
 				default: '',
-				description: 'Only mentions published at or after this time',
+				description:
+					'Only mentions RedReplier found at or after this time. This is when the mention was ingested, not when it was posted.',
 				routing: { send: { type: 'query', property: 'from' } },
 			},
 			{
@@ -149,7 +150,8 @@ export const mentionProperties: INodeProperties[] = [
 				name: 'to',
 				type: 'dateTime',
 				default: '',
-				description: 'Only mentions published at or before this time',
+				description:
+					'Only mentions RedReplier found at or before this time. This is when the mention was ingested, not when it was posted.',
 				routing: { send: { type: 'query', property: 'to' } },
 			},
 			{

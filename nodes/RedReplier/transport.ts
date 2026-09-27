@@ -27,6 +27,7 @@ export async function redReplierApiRequest(
 		qs,
 		body,
 		json: true,
+		arrayFormat: 'repeat',
 	};
 	return (await this.helpers.httpRequestWithAuthentication.call(
 		this,

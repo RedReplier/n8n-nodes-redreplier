@@ -40,7 +40,7 @@ export class RedReplierApi implements ICredentialType {
 	test: ICredentialTestRequest = {
 		request: {
 			baseURL: 'https://ai.redreplier.com/ai-app/api/v1',
-			url: '/websites',
+			url: '/workspaces',
 		},
 	};
 }

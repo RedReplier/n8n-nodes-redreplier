@@ -87,15 +87,14 @@ export class RedReplierTrigger implements INodeType {
 			websiteId: this.getNodeParameter('websiteId', '') || undefined,
 			sources: this.getNodeParameter('sources', []),
 			includeLowRelevance: this.getNodeParameter('includeLowRelevance', false),
+			minScore: minScore > 0 ? minScore : undefined,
 			statuses: ['NEW'],
 			sort: 'RECENT',
 			limit: 100,
 		};
 
 		const { mentions } = await redReplierApiRequest.call(this, 'GET', '/mentions', undefined, qs);
-		const relevant = (mentions as Mention[]).filter(
-			(mention) => (mention.relevanceScore ?? 0) >= minScore,
-		);
+		const relevant = mentions as Mention[];
 
 		if (this.getMode() === 'manual') {
 			const sample = relevant.slice(0, MANUAL_SAMPLE_SIZE);

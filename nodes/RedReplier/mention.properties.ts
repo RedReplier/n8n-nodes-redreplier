@@ -119,6 +119,16 @@ export const mentionProperties: INodeProperties[] = [
 				},
 			},
 			{
+				displayName: 'Minimum Relevance Score',
+				name: 'minScore',
+				type: 'number',
+				typeOptions: { minValue: 0, maxValue: 100 },
+				default: 70,
+				description:
+					'Only mentions scored at least this. Unscored mentions are left out. Turn on Include Low Relevance to go below the website minimum.',
+				routing: { send: { type: 'query', property: 'minScore' } },
+			},
+			{
 				displayName: 'Sources',
 				name: 'sources',
 				type: 'multiOptions',
